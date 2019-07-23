@@ -22,6 +22,30 @@ class NotesController: UITableViewController {
         tableView.register(UITableViewCell.self, forCellReuseIdentifier: CUSTOM_CELL_ID)
     }
     
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        self.navigationController?.setToolbarHidden(false, animated: false)
+        let items: [UIBarButtonItem] = [
+            UIBarButtonItem(barButtonSystemItem: .organize, target: nil, action: nil),
+            UIBarButtonItem(barButtonSystemItem: .flexibleSpace, target: nil, action: nil),
+            UIBarButtonItem(title: "\(5) Notes", style: .done, target: nil, action: nil),
+            UIBarButtonItem(barButtonSystemItem: .flexibleSpace, target: nil, action: nil),
+            UIBarButtonItem(barButtonSystemItem: .compose, target: self, action: #selector(self.createNewNote))
+        ]
+        self.toolbarItems = items
+    }
+    
+    override func viewWillDisappear(_ animated: Bool) {
+        self.navigationController?.setToolbarHidden(true, animated: false)
+    }
+    
+    @objc fileprivate func createNewNote() {
+        let noteDetailController = NotesDetailController()
+        navigationController?.pushViewController(noteDetailController, animated: true)
+    }
+        
+
+    
     
 }
 
@@ -37,6 +61,8 @@ extension NotesController {
     }
     
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        let notesDetailController = NotesDetailController()
+        navigationController?.pushViewController(notesDetailController, animated: true)
        
     }
 }

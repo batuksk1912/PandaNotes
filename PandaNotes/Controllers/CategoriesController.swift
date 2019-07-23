@@ -31,6 +31,12 @@ class CategoriesController: UITableViewController {
         setupTranslucentViews()
     }
     
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        let addButton = UIBarButtonItem(barButtonSystemItem: .add, target: nil, action: nil)
+        self.navigationItem.setRightBarButtonItems([addButton], animated: false)
+    }
+    
     fileprivate func setupTableViewController() {
         tableView.register(UITableViewCell.self, forCellReuseIdentifier: CUSTOM_CELL_ID)
         tableView.tableHeaderView = header

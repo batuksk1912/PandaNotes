@@ -9,6 +9,7 @@
 /* Begin PBXBuildFile section */
 		0484BABB22E6DD830060A7E1 /* NotesController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0484BABA22E6DD830060A7E1 /* NotesController.swift */; };
 		0484BABD22E6E4290060A7E1 /* Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0484BABC22E6E4290060A7E1 /* Extensions.swift */; };
+		0484BABF22E6F1680060A7E1 /* NotesDetailController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0484BABE22E6F1680060A7E1 /* NotesDetailController.swift */; };
 		049E75E522E6D5D7003210F2 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 049E75E422E6D5D7003210F2 /* AppDelegate.swift */; };
 		049E75E722E6D5D7003210F2 /* CategoriesController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 049E75E622E6D5D7003210F2 /* CategoriesController.swift */; };
 		049E75EC22E6D5DC003210F2 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 049E75EB22E6D5DC003210F2 /* Assets.xcassets */; };
@@ -18,6 +19,7 @@
 /* Begin PBXFileReference section */
 		0484BABA22E6DD830060A7E1 /* NotesController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotesController.swift; sourceTree = "<group>"; };
 		0484BABC22E6E4290060A7E1 /* Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Extensions.swift; sourceTree = "<group>"; };
+		0484BABE22E6F1680060A7E1 /* NotesDetailController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotesDetailController.swift; sourceTree = "<group>"; };
 		049E75E122E6D5D7003210F2 /* PandaNotes.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = PandaNotes.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		049E75E422E6D5D7003210F2 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		049E75E622E6D5D7003210F2 /* CategoriesController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CategoriesController.swift; sourceTree = "<group>"; };
@@ -42,6 +44,7 @@
 			children = (
 				049E75E622E6D5D7003210F2 /* CategoriesController.swift */,
 				0484BABA22E6DD830060A7E1 /* NotesController.swift */,
+				0484BABE22E6F1680060A7E1 /* NotesDetailController.swift */,
 			);
 			path = Controllers;
 			sourceTree = "<group>";
@@ -49,7 +52,6 @@
 		049E75D822E6D5D7003210F2 = {
 			isa = PBXGroup;
 			children = (
-				0484BABC22E6E4290060A7E1 /* Extensions.swift */,
 				049E75E322E6D5D7003210F2 /* PandaNotes */,
 				049E75E222E6D5D7003210F2 /* Products */,
 			);
@@ -68,6 +70,7 @@
 			children = (
 				0484BAB922E6DD4D0060A7E1 /* Controllers */,
 				049E75E422E6D5D7003210F2 /* AppDelegate.swift */,
+				0484BABC22E6E4290060A7E1 /* Extensions.swift */,
 				049E75EB22E6D5DC003210F2 /* Assets.xcassets */,
 				049E75ED22E6D5DC003210F2 /* LaunchScreen.storyboard */,
 				049E75F022E6D5DC003210F2 /* Info.plist */,
@@ -145,6 +148,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				0484BABF22E6F1680060A7E1 /* NotesDetailController.swift in Sources */,
 				0484BABB22E6DD830060A7E1 /* NotesController.swift in Sources */,
 				049E75E722E6D5D7003210F2 /* CategoriesController.swift in Sources */,
 				049E75E522E6D5D7003210F2 /* AppDelegate.swift in Sources */,
