@@ -20,6 +20,15 @@ class NotesDetailController: UIViewController {
         return dateFormatter
     }()
     
+    var noteData:Note! {
+        didSet {
+            noteTextView.text = noteData.title
+            dateTimeLabel.text = dateFormatter.string(from: noteData.date ?? Date())
+        }
+    }
+    
+    var delegate: NoteDelegate?
+    
     fileprivate var noteTextView: UITextView = {
         let nt = UITextView()
         nt.translatesAutoresizingMaskIntoConstraints = false
@@ -66,6 +75,18 @@ class NotesDetailController: UIViewController {
             UIBarButtonItem(barButtonSystemItem: .camera, target: nil, action: nil)
         ]
         self.navigationItem.setRightBarButtonItems(topItems, animated: false)
+    }
+    
+    override func viewWillDisappear(_ animated: Bool) {
+        super.viewWillDisappear(animated)
+        
+        if self.noteData == nil {
+            delegate?.saveNewNote(title: noteTextView.text, date: Date(), text: noteTextView.text)
+        } else {
+            // update our note here.
+            //guard let newText = self.textView.text else { return }
+            //CoreDataManager.shared.saveUpdatedNote(note: self.noteData, newText: newText)
+        }
     }
 }
     

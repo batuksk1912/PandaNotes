@@ -14,7 +14,7 @@ class NotesController: UITableViewController {
     
     var categoryData:NoteCategory! {
         didSet {
-            //notes = CoreDataManager.shared.fetchNotes(from: categoryData)
+            notes = CoreDataManager.shared.fetchNotes(from: categoryData)
             filteredNotes = notes
         }
     }
@@ -64,22 +64,22 @@ class NotesController: UITableViewController {
     
     @objc fileprivate func createNewNote() {
         let noteDetailController = NotesDetailController()
+        noteDetailController.delegate = (self as NoteDelegate)
         navigationController?.pushViewController(noteDetailController, animated: true)
     }
-        
-
-    
     
 }
 
 extension NotesController {
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let customCell = tableView.dequeueReusableCell(withIdentifier: CUSTOM_CELL_ID, for: indexPath) as! NoteCell
+        let noteForRow = self.filteredNotes[indexPath.row]
+        customCell.noteData = noteForRow
         return customCell
     }
     
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return 5
+        return self.filteredNotes.count
     }
     
     override func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
@@ -88,6 +88,8 @@ extension NotesController {
     
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         let notesDetailController = NotesDetailController()
+        let noteForRow = self.filteredNotes[indexPath.row]
+        notesDetailController.noteData = noteForRow
         navigationController?.pushViewController(notesDetailController, animated: true)
        
     }
@@ -109,6 +111,15 @@ extension NotesController: UISearchBarDelegate {
         if !cachedText.isEmpty && !filteredNotes.isEmpty {
             searchController.searchBar.text = cachedText
         }
+    }
+}
+
+extension NotesController: NoteDelegate {
+    func saveNewNote(title: String, date: Date, text: String) {
+        let newNote = CoreDataManager.shared.createNewNote(title: title, date: date, text: text, noteCategory: self.categoryData)
+        notes.append(newNote)
+        filteredNotes.append(newNote)
+        self.tableView.insertRows(at: [IndexPath(row: notes.count - 1, section: 0)], with: .fade)
     }
 }
 
