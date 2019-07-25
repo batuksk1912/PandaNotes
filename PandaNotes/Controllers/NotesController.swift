@@ -10,16 +10,39 @@ import UIKit
 
 class NotesController: UITableViewController {
     
+    let searchController = UISearchController(searchResultsController: nil)
+    
+    var categoryData:NoteCategory! {
+        didSet {
+            //notes = CoreDataManager.shared.fetchNotes(from: categoryData)
+            filteredNotes = notes
+        }
+    }
+    
+    fileprivate var notes = [Note]()
+    fileprivate var filteredNotes = [Note]()
+    var cachedText:String = ""
+
+    
     fileprivate let CUSTOM_CELL_ID:String = "CUSTOM_CELL_ID"
     
     override func viewDidLoad() {
         super.viewDidLoad()
         self.navigationItem.title = "Notes"
         setupTableViewController()
+        setupSearchBar()
     }
     
     fileprivate func setupTableViewController() {
-        tableView.register(UITableViewCell.self, forCellReuseIdentifier: CUSTOM_CELL_ID)
+        tableView.register(NoteCell.self, forCellReuseIdentifier: CUSTOM_CELL_ID)
+    }
+    
+    fileprivate func setupSearchBar() {
+        self.definesPresentationContext = true
+        navigationItem.searchController = searchController
+        navigationItem.hidesSearchBarWhenScrolling = false
+        searchController.dimsBackgroundDuringPresentation = true
+        searchController.searchBar.delegate = self
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -51,8 +74,7 @@ class NotesController: UITableViewController {
 
 extension NotesController {
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let customCell = tableView.dequeueReusableCell(withIdentifier: CUSTOM_CELL_ID, for: indexPath)
-        customCell.textLabel?.text = "TEST NOTE DATA"
+        let customCell = tableView.dequeueReusableCell(withIdentifier: CUSTOM_CELL_ID, for: indexPath) as! NoteCell
         return customCell
     }
     
@@ -60,10 +82,33 @@ extension NotesController {
         return 5
     }
     
+    override func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
+        return 60
+    }
+    
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         let notesDetailController = NotesDetailController()
         navigationController?.pushViewController(notesDetailController, animated: true)
        
+    }
+}
+
+extension NotesController: UISearchBarDelegate {
+    func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {
+        filteredNotes = notes.filter({ (note) -> Bool in
+            return note.title?.lowercased().contains(searchText.lowercased()) ?? false
+        })
+        if searchBar.text!.isEmpty && filteredNotes.isEmpty {
+            filteredNotes = notes
+        }
+        cachedText = searchText
+        tableView.reloadData()
+    }
+    
+    func searchBarTextDidEndEditing(_ searchBar: UISearchBar) {
+        if !cachedText.isEmpty && !filteredNotes.isEmpty {
+            searchController.searchBar.text = cachedText
+        }
     }
 }
 

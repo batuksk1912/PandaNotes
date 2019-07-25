@@ -8,6 +8,8 @@
 
 import UIKit
 
+var noteCategory = [NoteCategory]()
+
 class CategoriesController: UITableViewController {
     
     fileprivate let CUSTOM_CELL_ID:String = "CUSTOM_CELL_ID"
@@ -27,18 +29,45 @@ class CategoriesController: UITableViewController {
         super.viewDidLoad()
         view.backgroundColor = .white
         navigationItem.title = "Categories"
+        noteCategory = CoreDataManager.shared.fetchNoteCategories()
         setupTableViewController()
         setupTranslucentViews()
     }
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
-        let addButton = UIBarButtonItem(barButtonSystemItem: .add, target: nil, action: nil)
+        let addButton = UIBarButtonItem(barButtonSystemItem: .add, target: self, action: #selector(self.handleAddNewCategory))
         self.navigationItem.setRightBarButtonItems([addButton], animated: false)
     }
     
+    var textField:UITextField!
+    
+    @objc fileprivate func handleAddNewCategory() {
+        let addAlert = UIAlertController(title: "New Category", message: "Enter a name for this category.", preferredStyle: .alert)
+        
+        addAlert.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: { (_) in
+            addAlert.dismiss(animated: true)
+        }))
+        
+        addAlert.addTextField { (tf) in
+            self.textField = tf
+        }
+        
+        addAlert.addAction(UIAlertAction(title: "Save", style: .default, handler: { (_) in
+            addAlert.dismiss(animated: true)
+            guard let title = self.textField.text else { return }
+            
+            let newFolder = CoreDataManager.shared.createNoteCategory(title: title)
+            noteCategory.append(newFolder)
+            self.tableView.insertRows(at: [IndexPath(row: noteCategory.count - 1, section: 0)], with: .fade)
+        }))
+        
+        present(addAlert, animated: true)
+    }
+
+    
     fileprivate func setupTableViewController() {
-        tableView.register(UITableViewCell.self, forCellReuseIdentifier: CUSTOM_CELL_ID)
+        tableView.register(CategoryCell.self, forCellReuseIdentifier: CUSTOM_CELL_ID)
         tableView.tableHeaderView = header
     }
     
@@ -64,18 +93,37 @@ class CategoriesController: UITableViewController {
 }
 
 extension CategoriesController {
+    
+    override func tableView(_ tableView: UITableView, editActionsForRowAt indexPath: IndexPath) -> [UITableViewRowAction]? {
+        let deleteAction = UITableViewRowAction(style: .destructive, title: "Delete") { (rowAction, indexPath) in
+            let noteSelectedCategory = noteCategory[indexPath.row]
+            if CoreDataManager.shared.deleteNoteCategories(noteCategory: noteSelectedCategory) {
+                noteCategory.remove(at: indexPath.row)
+                tableView.deleteRows(at: [indexPath], with: .fade)
+            }
+        }
+        return [deleteAction]
+    }
+    
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let customCell = tableView.dequeueReusableCell(withIdentifier: CUSTOM_CELL_ID, for: indexPath)
-        customCell.textLabel?.text = "TEST DATA"
+        let customCell = tableView.dequeueReusableCell(withIdentifier: CUSTOM_CELL_ID, for: indexPath) as! CategoryCell
+        let categoryForRow = noteCategory[indexPath.row]
+        customCell.categoryData = categoryForRow
         return customCell
     }
     
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return 3
+        return noteCategory.count
+    }
+    
+    override func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
+        return 50
     }
     
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         let notesController = NotesController()
+        let categoryForRowSelected = noteCategory[indexPath.row]
+        notesController.categoryData = categoryForRowSelected
         navigationController?.pushViewController(notesController, animated: true)
     }
     
