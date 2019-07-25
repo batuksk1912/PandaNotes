@@ -51,15 +51,17 @@ class NotesController: UITableViewController {
         let items: [UIBarButtonItem] = [
             UIBarButtonItem(barButtonSystemItem: .organize, target: nil, action: nil),
             UIBarButtonItem(barButtonSystemItem: .flexibleSpace, target: nil, action: nil),
-            UIBarButtonItem(title: "\(5) Notes", style: .done, target: nil, action: nil),
+            UIBarButtonItem(title: "\(notes.count) Notes", style: .done, target: nil, action: nil),
             UIBarButtonItem(barButtonSystemItem: .flexibleSpace, target: nil, action: nil),
             UIBarButtonItem(barButtonSystemItem: .compose, target: self, action: #selector(self.createNewNote))
         ]
         self.toolbarItems = items
+        tableView.reloadData()
     }
     
     override func viewWillDisappear(_ animated: Bool) {
         self.navigationController?.setToolbarHidden(true, animated: false)
+        tableView.reloadData()
     }
     
     @objc fileprivate func createNewNote() {
@@ -71,6 +73,26 @@ class NotesController: UITableViewController {
 }
 
 extension NotesController {
+    
+
+    
+    override func tableView(_ tableView: UITableView, editActionsForRowAt indexPath: IndexPath) -> [UITableViewRowAction]? {
+        
+        var actions = [UITableViewRowAction]()
+        
+        let deleteAction = UITableViewRowAction(style: .destructive, title: "Delete") { (action, indexPath) in
+            let targetRow = indexPath.row
+            if CoreDataManager.shared.deleteNote(note: self.notes[targetRow]) {
+                self.notes.remove(at: targetRow)
+                self.filteredNotes.remove(at: targetRow)
+                tableView.deleteRows(at: [indexPath], with: .fade)
+                self.viewWillAppear(true)
+            }
+        }
+        actions.append(deleteAction)
+        return actions
+    }
+    
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let customCell = tableView.dequeueReusableCell(withIdentifier: CUSTOM_CELL_ID, for: indexPath) as! NoteCell
         let noteForRow = self.filteredNotes[indexPath.row]

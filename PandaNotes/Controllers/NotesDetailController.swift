@@ -83,9 +83,8 @@ class NotesDetailController: UIViewController {
         if self.noteData == nil {
             delegate?.saveNewNote(title: noteTextView.text, date: Date(), text: noteTextView.text)
         } else {
-            // update our note here.
-            //guard let newText = self.textView.text else { return }
-            //CoreDataManager.shared.saveUpdatedNote(note: self.noteData, newText: newText)
+            guard let newText = self.noteTextView.text else { return }
+            CoreDataManager.shared.saveUpdatedNote(note: self.noteData, newText: newText)
         }
     }
 }

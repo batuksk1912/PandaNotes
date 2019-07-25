@@ -91,6 +91,35 @@ struct CoreDataManager {
         return categoryNotes
     }
     
+    func deleteNote(note: Note) -> Bool {
+        let context = persistentContainer.viewContext
+        
+        context.delete(note)
+        
+        do {
+            try context.save()
+            return true
+        } catch let err {
+            print("Error deleting note entity instance",err)
+            return false
+        }
+    }
+    
+    func saveUpdatedNote(note: Note, newText: String) {
+        let context = persistentContainer.viewContext
+        
+        note.title = newText
+        note.text = newText as NSObject
+        note.date = Date()
+        
+        do {
+            try context.save()
+        } catch let err {
+            print("Error updating note",err)
+        }
+        
+    }
+    
    
     
     

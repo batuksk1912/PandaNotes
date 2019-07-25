@@ -38,6 +38,7 @@ class CategoriesController: UITableViewController {
         super.viewWillAppear(animated)
         let addButton = UIBarButtonItem(barButtonSystemItem: .add, target: self, action: #selector(self.handleAddNewCategory))
         self.navigationItem.setRightBarButtonItems([addButton], animated: false)
+        tableView.reloadData()
     }
     
     var textField:UITextField!

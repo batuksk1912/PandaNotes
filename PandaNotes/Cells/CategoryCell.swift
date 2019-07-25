@@ -13,8 +13,8 @@ class CategoryCell: UITableViewCell {
     var categoryData:NoteCategory! {
         didSet {
             label.text = categoryData.title
-            //let count = CoreDataManager.shared.fetchNotes(from: categoryData).count
-            //countLabel.text = String(count)
+            let count = CoreDataManager.shared.fetchNotes(from: categoryData).count
+            countLabel.text = String(count)
         }
     }
     
