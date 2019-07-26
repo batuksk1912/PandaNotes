@@ -48,8 +48,13 @@ class NotesController: UITableViewController {
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         self.navigationController?.setToolbarHidden(false, animated: false)
+        let topItems:[UIBarButtonItem] = [
+            UIBarButtonItem(title: "Sort by Date", style: .done, target: nil, action: nil),
+            UIBarButtonItem(title: "Sort by Title", style: .done, target: nil, action: nil)
+        ]
+        self.navigationItem.setRightBarButtonItems(topItems, animated: false)
         let items: [UIBarButtonItem] = [
-            UIBarButtonItem(barButtonSystemItem: .organize, target: nil, action: nil),
+            UIBarButtonItem(barButtonSystemItem: .organize, target: self, action: #selector(self.navigateCategories)),
             UIBarButtonItem(barButtonSystemItem: .flexibleSpace, target: nil, action: nil),
             UIBarButtonItem(title: "\(notes.count) Notes", style: .done, target: nil, action: nil),
             UIBarButtonItem(barButtonSystemItem: .flexibleSpace, target: nil, action: nil),
@@ -68,6 +73,10 @@ class NotesController: UITableViewController {
         let noteDetailController = NotesDetailController()
         noteDetailController.delegate = (self as NoteDelegate)
         navigationController?.pushViewController(noteDetailController, animated: true)
+    }
+    
+    @objc fileprivate func navigateCategories() {
+        navigationController?.popViewController(animated: true)
     }
     
 }

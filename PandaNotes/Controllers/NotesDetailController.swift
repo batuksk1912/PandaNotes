@@ -81,7 +81,9 @@ class NotesDetailController: UIViewController {
         super.viewWillDisappear(animated)
         
         if self.noteData == nil {
+            if (self.noteTextView.text != "") {
             delegate?.saveNewNote(title: noteTextView.text, date: Date(), text: noteTextView.text)
+            }
         } else {
             guard let newText = self.noteTextView.text else { return }
             CoreDataManager.shared.saveUpdatedNote(note: self.noteData, newText: newText)

@@ -120,6 +120,25 @@ struct CoreDataManager {
         
     }
     
+    func checkIfCategoryExist(title: String) -> Bool {
+        
+        let managedContext = persistentContainer.viewContext
+        let fetchRequest = NSFetchRequest<NoteCategory>(entityName: "NoteCategory")
+        fetchRequest.fetchLimit =  1
+        fetchRequest.predicate = NSPredicate(format: "title == %@" ,title)
+        do {
+            let count = try managedContext.count(for: fetchRequest)
+            if count > 0 {
+                return true
+            }else {
+                return false
+            }
+        }catch let error as NSError {
+            print("Could not fetch categories. \(error), \(error.userInfo)")
+            return false
+        }
+    }
+    
    
     
     

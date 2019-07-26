@@ -16,7 +16,7 @@ class NoteCell: UITableViewCell {
             dateFormatter.dateFormat = "MM/dd/yy"
             noteTitle.text = noteData.title
             dateLabel.text = dateFormatter.string(from: noteData.date ?? Date())
-            previewLabel.text = noteData.text as? String
+            previewLabel.text = "Category: " + noteData.noteCategory!.title! 
         }
     }
 
@@ -29,7 +29,7 @@ class NoteCell: UITableViewCell {
     
     fileprivate var dateLabel: UILabel = {
         let label = UILabel()
-        label.text = "9/15/97"
+        label.text = "04/12/94"
         label.font = UIFont.systemFont(ofSize: 14, weight: .light)
         label.textColor = .gray
         return label
@@ -37,7 +37,7 @@ class NoteCell: UITableViewCell {
     
     fileprivate var previewLabel: UILabel = {
         let label = UILabel()
-        label.text = "the note text will go here to create a preview...."
+        label.text = "The note text will go here to create a preview..."
         label.font = UIFont.systemFont(ofSize: 13, weight: .light)
         label.textColor = UIColor.gray.withAlphaComponent(0.8)
         return label

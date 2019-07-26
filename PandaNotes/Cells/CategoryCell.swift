@@ -27,7 +27,7 @@ class CategoryCell: UITableViewCell {
     
     fileprivate var countLabel:UILabel = {
         let label = UILabel()
-        label.text = "5"
+        label.text = "0"
         label.font = UIFont.systemFont(ofSize: 16, weight: .regular)
         return label
     }()
