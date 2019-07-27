@@ -52,7 +52,7 @@ class NotesController: UITableViewController {
             UIBarButtonItem(title: "Sort by Date", style: .done, target: self, action: #selector(self.sortByDate)),
             UIBarButtonItem(title: "Sort by Title", style: .done, target: self, action: #selector(self.sortByTitle))
         ]
-        self.navigationItem.setRightBarButtonItems(topItems, animated: false)
+        self.navigationItem.setRightBarButtonItems(topItems, animated: true)
         let items: [UIBarButtonItem] = [
             UIBarButtonItem(barButtonSystemItem: .organize, target: self, action: #selector(self.navigateCategories)),
             UIBarButtonItem(barButtonSystemItem: .flexibleSpace, target: nil, action: nil),
