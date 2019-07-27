@@ -22,7 +22,6 @@ class NotesController: UITableViewController {
     fileprivate var notes = [Note]()
     fileprivate var filteredNotes = [Note]()
     var cachedText:String = ""
-
     
     fileprivate let CUSTOM_CELL_ID:String = "CUSTOM_CELL_ID"
     
@@ -50,8 +49,8 @@ class NotesController: UITableViewController {
         super.viewWillAppear(animated)
         self.navigationController?.setToolbarHidden(false, animated: false)
         let topItems:[UIBarButtonItem] = [
-            UIBarButtonItem(title: "Sort by Date", style: .done, target: nil, action: nil),
-            UIBarButtonItem(title: "Sort by Title", style: .done, target: nil, action: nil)
+            UIBarButtonItem(title: "Sort by Date", style: .done, target: self, action: #selector(self.sortByDate)),
+            UIBarButtonItem(title: "Sort by Title", style: .done, target: self, action: #selector(self.sortByTitle))
         ]
         self.navigationItem.setRightBarButtonItems(topItems, animated: false)
         let items: [UIBarButtonItem] = [
@@ -67,6 +66,26 @@ class NotesController: UITableViewController {
     
     override func viewWillDisappear(_ animated: Bool) {
         self.navigationController?.setToolbarHidden(true, animated: false)
+        tableView.reloadData()
+    }
+    
+    @objc fileprivate func sortByDate() {
+        notes.sort(by: { (obj1, obj2) -> Bool in
+            return obj1.date! < obj2.date!
+        })
+        filteredNotes.sort(by: { (obj1, obj2) -> Bool in
+            return obj1.date! < obj2.date!
+        })
+        tableView.reloadData()
+    }
+    
+    @objc fileprivate func sortByTitle() {
+        notes.sort(by: { (obj1, obj2) -> Bool in
+            return obj1.title! < obj2.title!
+        })
+        filteredNotes.sort(by: { (obj1, obj2) -> Bool in
+            return obj1.title! < obj2.title!
+        })
         tableView.reloadData()
     }
     
