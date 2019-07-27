@@ -73,7 +73,7 @@ class NotesDetailController: UIViewController, CLLocationManagerDelegate {
         setupTextView()
         locManager.delegate = self
         locManager.desiredAccuracy = kCLLocationAccuracyNearestTenMeters
-        locManager.distanceFilter = 100
+        locManager.distanceFilter = 20
         locManager.requestWhenInUseAuthorization()
     }
     
@@ -93,36 +93,44 @@ class NotesDetailController: UIViewController, CLLocationManagerDelegate {
     }
     
     @objc fileprivate func checkLocation() {
+        if (self.noteData != nil) {
         let locationController = LocationController()
+        print(noteData.lat.rounded(digits: 3))
+        print(lat!.rounded(digits: 3))
         if (noteData.lat != 0.0 && noteData.lng != 0.0) {
-        locationController.lat = noteData.lat.rounded(digits: 2)
-        locationController.lng = noteData.lng.rounded(digits: 2)
+        locationController.lat = noteData.lat.rounded(digits: 3)
+        locationController.lng = noteData.lng.rounded(digits: 3)
         } else {
-            locationController.lat = lat?.rounded(digits: 2)
-            locationController.lng = lng?.rounded(digits: 2)
+            locationController.lat = lat?.rounded(digits: 3)
+            locationController.lng = lng?.rounded(digits: 3)
         }
         navigationController?.pushViewController(locationController, animated: true)
+        }
     }
     
     override func viewWillDisappear(_ animated: Bool) {
         super.viewWillDisappear(animated)
         if self.noteData == nil {
             if (self.noteTextView.text != "") {
-                delegate?.saveNewNote(title: noteTextView.text, date: Date(), text: noteTextView.text, lat:lat!.rounded(digits: 2), lng:lng!.rounded(digits: 2))
+                delegate?.saveNewNote(title: noteTextView.text, date: Date(), text: noteTextView.text, lat:lat!.rounded(digits: 3), lng:lng!.rounded(digits: 3))
             }
         } else {
-            if (noteData.lat.rounded(digits: 2) != lat?.rounded(digits: 2) || noteData.lng.rounded(digits: 2) != lng?.rounded(digits: 2) ) {
-                let alert = UIAlertController(title: "Notice", message: "Note location is changed. Do you want to update location?", preferredStyle: UIAlertController.Style.alert)
-                alert.addAction(UIAlertAction(title: "Yes", style: UIAlertAction.Style.default, handler: { action in
-                    guard let newText = self.noteTextView.text else { return }
-                    CoreDataManager.shared.saveUpdatedNote(note: self.noteData, newText: newText, newLat: self.lat!.rounded(digits: 2), newLng: self.lng!.rounded(digits: 2))
-                    self.navigationController?.popViewController(animated: false)
-                }))
-                alert.addAction(UIAlertAction(title: "Cancel", style: UIAlertAction.Style.cancel, handler: nil))
-                self.present(alert, animated: true, completion: nil)
-            } else {
-            guard let newText = self.noteTextView.text else { return }
-            CoreDataManager.shared.saveUpdatedNote(note: self.noteData, newText: newText, newLat: noteData.lat.rounded(digits: 2), newLng: noteData.lng.rounded(digits: 2))
+                //lat = 43.80
+                if (noteData.lat.rounded(digits: 3) != lat?.rounded(digits: 3) || noteData.lng.rounded(digits: 3) != lng?.rounded(digits: 3) ) {
+                    let alert = UIAlertController(title: "Notice", message: "Note location is changed. Do you want to update location?", preferredStyle: UIAlertController.Style.alert)
+                    alert.addAction(UIAlertAction(title: "Yes", style: UIAlertAction.Style.default, handler: { action in
+                        guard let newText = self.noteTextView.text else { return }
+                        CoreDataManager.shared.saveUpdatedNote(note: self.noteData, newText: newText, newLat: self.lat!.rounded(digits: 3), newLng: self.lng!.rounded(digits: 3))
+                        self.navigationController?.popViewController(animated: false)
+                    }))
+                    alert.addAction(UIAlertAction(title: "Cancel", style: UIAlertAction.Style.cancel, handler: nil))
+                    DispatchQueue.main.async(execute: {
+                        self.present(alert, animated: true)
+                    })
+                }
+             else {
+                guard let newText = self.noteTextView.text else { return }
+                CoreDataManager.shared.saveUpdatedNote(note: self.noteData, newText: newText, newLat: noteData.lat.rounded(digits: 3), newLng: noteData.lng.rounded(digits: 3))
             }
         }
     }
