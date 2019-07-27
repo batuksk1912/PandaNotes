@@ -10,7 +10,7 @@ import UIKit
 import CoreLocation
 
 protocol NoteDelegate {
-    func saveNewNote(title: String, date: Date, text: String, lat: Double, lng: Double)
+    func saveNewNote(title: NSData, date: Date, text: NSData, lat: Double, lng: Double)
 }
 
 class NotesDetailController: UIViewController, CLLocationManagerDelegate, UIImagePickerControllerDelegate, UINavigationControllerDelegate {
@@ -76,16 +76,16 @@ class NotesDetailController: UIViewController, CLLocationManagerDelegate, UIImag
         locManager.desiredAccuracy = kCLLocationAccuracyNearestTenMeters
         locManager.distanceFilter = 20
         locManager.requestWhenInUseAuthorization()
-    }
-    
-    override func viewWillAppear(_ animated: Bool) {
-        super.viewWillAppear(animated)
-        curLoc = locManager.location!
         let topItems:[UIBarButtonItem] = [
             UIBarButtonItem(barButtonSystemItem: .action, target: self, action: #selector(self.checkLocation)),
             UIBarButtonItem(barButtonSystemItem: .camera, target: self, action: #selector(self.imageAdder))
         ]
         self.navigationItem.setRightBarButtonItems(topItems, animated: false)
+    }
+    
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        curLoc = locManager.location!
         if (CLLocationManager.authorizationStatus() == .authorizedWhenInUse ||
             CLLocationManager.authorizationStatus() ==  .authorizedAlways) {
             lat = curLoc.coordinate.latitude
@@ -110,6 +110,7 @@ class NotesDetailController: UIViewController, CLLocationManagerDelegate, UIImag
     }
     
     @objc fileprivate func imageAdder() {
+        if (self.noteData != nil) {
         let pickerController = UIImagePickerController()
         pickerController.delegate = self;
         pickerController.allowsEditing = true
@@ -142,6 +143,9 @@ class NotesDetailController: UIViewController, CLLocationManagerDelegate, UIImag
         alertController.addAction(cancelAction)
         
         present(alertController, animated: true, completion: nil)
+        } else {
+            navigationController?.popViewController(animated: false)
+        }
         
     }
     
@@ -151,16 +155,18 @@ class NotesDetailController: UIViewController, CLLocationManagerDelegate, UIImag
     
     func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [UIImagePickerController.InfoKey : Any]) {
         if let image = info[UIImagePickerController.InfoKey.originalImage] as? UIImage {
-            let attachment = NSTextAttachment()
-            attachment.image = image
+            //let attachment = NSTextAttachment()
+            //attachment.image = image
             //calculate new size.  (-20 because I want to have a litle space on the right of picture)
-            let newImageWidth = (noteTextView.bounds.size.width - 20 )
-            let scale = newImageWidth/image.size.width
-            let newImageHeight = image.size.height * scale
+            //let newImageWidth = (noteTextView.bounds.size.width - 20 )
+            //let scale = newImageWidth/image.size.width
+            //let newImageHeight = image.size.height * scale
             //resize this
-            attachment.bounds = CGRect.init(x: 0, y: 0, width: newImageWidth, height: newImageHeight)
+            //attachment.bounds = CGRect.init(x: 0, y: 0, width: newImageWidth, height: newImageHeight)
             //put your NSTextAttachment into and attributedString
-            let attString = NSAttributedString(attachment: attachment)
+            let scaledImage = image.resized(toWidth: self.noteTextView.frame.size.width)
+            let encodedImageString = (scaledImage!.pngData()?.base64EncodedString())!
+            let attString = NSAttributedString(base64EndodedImageString: encodedImageString)!
             //add this attributed string to the current position.
             noteTextView.textStorage.insert(attString, at: noteTextView.selectedRange.location)
             picker.dismiss(animated: true, completion: nil)
@@ -174,7 +180,7 @@ class NotesDetailController: UIViewController, CLLocationManagerDelegate, UIImag
         super.viewWillDisappear(animated)
         if self.noteData == nil {
             if (self.noteTextView.text != "") {
-                delegate?.saveNewNote(title: noteTextView.text, date: Date(), text: noteTextView.text, lat:lat!.rounded(digits: 3), lng:lng!.rounded(digits: 3))
+                delegate?.saveNewNote(title: noteTextView.attributedText.toNSData()!, date: Date(), text: noteTextView.attributedText.toNSData()!, lat:lat!.rounded(digits: 3), lng:lng!.rounded(digits: 3))
             }
         } else {
                 //lat = 43.80

@@ -148,7 +148,7 @@ extension NotesController: UISearchBarDelegate {
 }
 
 extension NotesController: NoteDelegate {
-    func saveNewNote(title: String, date: Date, text: String, lat: Double, lng: Double) {
+    func saveNewNote(title: NSData, date: Date, text: NSData, lat: Double, lng: Double) {
         let newNote = CoreDataManager.shared.createNewNote(title: title, date: date, text: text, lat: lat, lng: lng, noteCategory: self.categoryData)
         notes.append(newNote)
         filteredNotes.append(newNote)

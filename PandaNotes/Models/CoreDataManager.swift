@@ -67,13 +67,13 @@ struct CoreDataManager {
         }
     }
     
-    func createNewNote(title: String, date: Date, text: String, lat: Double, lng: Double, noteCategory: NoteCategory) -> Note {
+    func createNewNote(title: NSData, date: Date, text: NSData, lat: Double, lng: Double, noteCategory: NoteCategory) -> Note {
         let context = persistentContainer.viewContext
         
         let newNote = NSEntityDescription.insertNewObject(forEntityName: "Note", into: context) as! Note
         
-        newNote.title = title
-        newNote.text = text as! NSData
+        newNote.title = title.toAttributedString()?.string
+        newNote.text = text
         newNote.date = date
         newNote.lat = lat
         newNote.lng = lng
@@ -110,7 +110,7 @@ struct CoreDataManager {
     func saveUpdatedNote(note: Note, newText: NSData, newLat: Double, newLng: Double) {
         let context = persistentContainer.viewContext
         
-        note.title = "Deneme"
+        note.title = newText.toAttributedString()?.string
         note.text = newText
         note.date = Date()
         note.lat = newLat
