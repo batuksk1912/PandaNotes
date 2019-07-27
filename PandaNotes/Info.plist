@@ -45,5 +45,9 @@
     <string>Will you allow this app to always know your location?</string>
     <key>NSLocationWhenInUseUsageDescription</key>
     <string>Do you allow this app to know your current location?</string>
+    <key>NSPhotoLibraryAddUsageDescription</key>
+    <string>${PRODUCT_NAME} Library Usage Permission</string>
+    <key>NSCameraUsageDescription</key>
+    <string>${PRODUCT_NAME} Camera Usage Permission</string>
 </dict>
 </plist>

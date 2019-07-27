@@ -13,7 +13,7 @@ protocol NoteDelegate {
     func saveNewNote(title: String, date: Date, text: String, lat: Double, lng: Double)
 }
 
-class NotesDetailController: UIViewController, CLLocationManagerDelegate {
+class NotesDetailController: UIViewController, CLLocationManagerDelegate, UIImagePickerControllerDelegate, UINavigationControllerDelegate {
     
     let dateFormatter: DateFormatter = {
         let dateFormatter = DateFormatter()
@@ -23,7 +23,7 @@ class NotesDetailController: UIViewController, CLLocationManagerDelegate {
     
     var noteData:Note! {
         didSet {
-            noteTextView.text = noteData.title
+            noteTextView.attributedText = noteData.text?.toAttributedString()
             dateTimeLabel.text = dateFormatter.string(from: noteData.date ?? Date())
         }
     }
@@ -69,6 +69,7 @@ class NotesDetailController: UIViewController, CLLocationManagerDelegate {
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        self.setupHideKeyboardOnTap()
         view.backgroundColor = .white
         setupTextView()
         locManager.delegate = self
@@ -82,7 +83,7 @@ class NotesDetailController: UIViewController, CLLocationManagerDelegate {
         curLoc = locManager.location!
         let topItems:[UIBarButtonItem] = [
             UIBarButtonItem(barButtonSystemItem: .action, target: self, action: #selector(self.checkLocation)),
-            UIBarButtonItem(barButtonSystemItem: .camera, target: nil, action: nil)
+            UIBarButtonItem(barButtonSystemItem: .camera, target: self, action: #selector(self.imageAdder))
         ]
         self.navigationItem.setRightBarButtonItems(topItems, animated: false)
         if (CLLocationManager.authorizationStatus() == .authorizedWhenInUse ||
@@ -108,6 +109,67 @@ class NotesDetailController: UIViewController, CLLocationManagerDelegate {
         }
     }
     
+    @objc fileprivate func imageAdder() {
+        let pickerController = UIImagePickerController()
+        pickerController.delegate = self;
+        pickerController.allowsEditing = true
+        
+        let alertController = UIAlertController(title: "Add an Image", message: "Choose From", preferredStyle: .actionSheet)
+        
+        let cameraAction = UIAlertAction(title: "Camera", style: .default) { (action) in
+            pickerController.sourceType = .camera
+            self.present(pickerController, animated: true, completion: nil)
+            
+        }
+        
+        let photosLibraryAction = UIAlertAction(title: "Photos Library", style: .default) { (action) in
+            pickerController.sourceType = .photoLibrary
+            self.present(pickerController, animated: true, completion: nil)
+            
+        }
+        
+        let savedPhotosAction = UIAlertAction(title: "Saved Photos Album", style: .default) { (action) in
+            pickerController.sourceType = .savedPhotosAlbum
+            self.present(pickerController, animated: true, completion: nil)
+            
+        }
+        
+        let cancelAction = UIAlertAction(title: "Cancel", style: .destructive, handler: nil)
+        
+        alertController.addAction(cameraAction)
+        alertController.addAction(photosLibraryAction)
+        alertController.addAction(savedPhotosAction)
+        alertController.addAction(cancelAction)
+        
+        present(alertController, animated: true, completion: nil)
+        
+    }
+    
+    func imagePickerControllerDidCancel(_ picker: UIImagePickerController) {
+        self.dismiss(animated: true, completion: nil)
+    }
+    
+    func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [UIImagePickerController.InfoKey : Any]) {
+        if let image = info[UIImagePickerController.InfoKey.originalImage] as? UIImage {
+            let attachment = NSTextAttachment()
+            attachment.image = image
+            //calculate new size.  (-20 because I want to have a litle space on the right of picture)
+            let newImageWidth = (noteTextView.bounds.size.width - 20 )
+            let scale = newImageWidth/image.size.width
+            let newImageHeight = image.size.height * scale
+            //resize this
+            attachment.bounds = CGRect.init(x: 0, y: 0, width: newImageWidth, height: newImageHeight)
+            //put your NSTextAttachment into and attributedString
+            let attString = NSAttributedString(attachment: attachment)
+            //add this attributed string to the current position.
+            noteTextView.textStorage.insert(attString, at: noteTextView.selectedRange.location)
+            picker.dismiss(animated: true, completion: nil)
+            self.dismiss(animated: true, completion: nil)
+        } else {
+            print("Error!")
+        }
+    }
+    
     override func viewWillDisappear(_ animated: Bool) {
         super.viewWillDisappear(animated)
         if self.noteData == nil {
@@ -119,7 +181,7 @@ class NotesDetailController: UIViewController, CLLocationManagerDelegate {
                 if (noteData.lat.rounded(digits: 3) != lat?.rounded(digits: 3) || noteData.lng.rounded(digits: 3) != lng?.rounded(digits: 3) ) {
                     let alert = UIAlertController(title: "Notice", message: "Note location is changed. Do you want to update location?", preferredStyle: UIAlertController.Style.alert)
                     alert.addAction(UIAlertAction(title: "Yes", style: UIAlertAction.Style.default, handler: { action in
-                        guard let newText = self.noteTextView.text else { return }
+                        guard let newText = self.noteTextView.attributedText.toNSData() else { return }
                         CoreDataManager.shared.saveUpdatedNote(note: self.noteData, newText: newText, newLat: self.lat!.rounded(digits: 3), newLng: self.lng!.rounded(digits: 3))
                         self.navigationController?.popViewController(animated: false)
                     }))
@@ -129,7 +191,7 @@ class NotesDetailController: UIViewController, CLLocationManagerDelegate {
                     })
                 }
              else {
-                guard let newText = self.noteTextView.text else { return }
+                guard let newText = self.noteTextView.attributedText.toNSData() else { return }
                 CoreDataManager.shared.saveUpdatedNote(note: self.noteData, newText: newText, newLat: noteData.lat.rounded(digits: 3), newLng: noteData.lng.rounded(digits: 3))
             }
         }

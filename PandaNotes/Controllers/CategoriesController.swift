@@ -28,6 +28,7 @@ class CategoriesController: UITableViewController {
 
     override func viewDidLoad() {
         super.viewDidLoad()
+        self.setupHideKeyboardOnTap()
         view.backgroundColor = .white
         navigationItem.title = "Categories"
         if (CoreDataManager.shared.checkIfCategoryExist(title: "Default") == false) {

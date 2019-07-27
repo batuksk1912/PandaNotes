@@ -40,3 +40,68 @@ extension Double {
         return (self * multiplier).rounded() / multiplier
     }
 }
+
+extension UIViewController {
+    func setupHideKeyboardOnTap() {
+        self.view.addGestureRecognizer(self.endEditingRecognizer())
+        self.navigationController?.navigationBar.addGestureRecognizer(self.endEditingRecognizer())
+    }
+    
+    private func endEditingRecognizer() -> UIGestureRecognizer {
+        let tap = UITapGestureRecognizer(target: self.view, action: #selector(self.view.endEditing(_:)))
+        tap.cancelsTouchesInView = false
+        return tap
+    }
+}
+
+extension NSData {
+    func toAttributedString() -> NSAttributedString? {
+        let data = Data(referencing: self)
+        let options : [NSAttributedString.DocumentReadingOptionKey: Any] = [
+            .documentType: NSAttributedString.DocumentType.rtfd,
+            .characterEncoding: String.Encoding.utf8
+        ]
+        
+        return try? NSAttributedString(data: data,
+                                       options: options,
+                                       documentAttributes: nil)
+    }
+}
+
+extension NSAttributedString {
+    func toNSData() -> NSData? {
+        let options : [NSAttributedString.DocumentAttributeKey: Any] = [
+            .documentType: NSAttributedString.DocumentType.rtfd,
+            .characterEncoding: String.Encoding.utf8
+        ]
+        
+        let range = NSRange(location: 0, length: length)
+        guard let data = try? data(from: range, documentAttributes: options) else {
+            return nil
+        }
+        
+        return NSData(data: data)
+    }
+}
+
+extension NSAttributedString {
+    convenience init?(base64EndodedImageString encodedImageString: String) {
+        var html = """
+        <!DOCTYPE html>
+        <html>
+        <body>
+        <img src="data:image/png;base64,\(encodedImageString)">
+        </body>
+        </html>
+        """
+        let data = Data(html.utf8)
+        let options: [NSAttributedString.DocumentReadingOptionKey : Any] = [
+            .documentType: NSAttributedString.DocumentType.html,
+            .characterEncoding: String.Encoding.utf8.rawValue
+        ]
+        try? self.init(data: data, options: options, documentAttributes: nil)
+    }
+}
+
+
+

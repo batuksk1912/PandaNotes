@@ -28,6 +28,7 @@ class NotesController: UITableViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        self.setupHideKeyboardOnTap()
         self.navigationItem.title = "Notes"
         setupTableViewController()
         setupSearchBar()
