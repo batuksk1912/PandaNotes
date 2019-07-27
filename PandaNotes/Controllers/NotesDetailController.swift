@@ -29,8 +29,9 @@ class NotesDetailController: UIViewController, CLLocationManagerDelegate, UIImag
     }
     
     var delegate: NoteDelegate?
+    let pickerController = UIImagePickerController()
     fileprivate let locManager = CLLocationManager()
-    fileprivate var curLoc = CLLocation()
+    //fileprivate var curLoc = CLLocation()
     fileprivate var lat:Double?
     fileprivate var lng:Double?
     
@@ -74,8 +75,17 @@ class NotesDetailController: UIViewController, CLLocationManagerDelegate, UIImag
         setupTextView()
         locManager.delegate = self
         locManager.desiredAccuracy = kCLLocationAccuracyNearestTenMeters
-        locManager.distanceFilter = 20
-        locManager.requestWhenInUseAuthorization()
+        locManager.distanceFilter = 50
+        if (CLLocationManager.authorizationStatus() == .authorizedWhenInUse ||
+            CLLocationManager.authorizationStatus() ==  .authorizedAlways) {
+            locManager.startUpdatingLocation()
+        } else {
+            locManager.requestWhenInUseAuthorization()
+        }
+    }
+    
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
         let topItems:[UIBarButtonItem] = [
             UIBarButtonItem(barButtonSystemItem: .action, target: self, action: #selector(self.checkLocation)),
             UIBarButtonItem(barButtonSystemItem: .camera, target: self, action: #selector(self.imageAdder))
@@ -83,13 +93,14 @@ class NotesDetailController: UIViewController, CLLocationManagerDelegate, UIImag
         self.navigationItem.setRightBarButtonItems(topItems, animated: false)
     }
     
-    override func viewWillAppear(_ animated: Bool) {
-        super.viewWillAppear(animated)
-        curLoc = locManager.location!
+    func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
         if (CLLocationManager.authorizationStatus() == .authorizedWhenInUse ||
             CLLocationManager.authorizationStatus() ==  .authorizedAlways) {
-            lat = curLoc.coordinate.latitude
-            lng = curLoc.coordinate.longitude
+            if let location = locations.last {
+            lat = location.coordinate.latitude
+            lng = location.coordinate.longitude
+            locManager.stopUpdatingLocation()
+            }
         }
     }
     
@@ -110,28 +121,26 @@ class NotesDetailController: UIViewController, CLLocationManagerDelegate, UIImag
     }
     
     @objc fileprivate func imageAdder() {
-        if (self.noteData != nil) {
-        let pickerController = UIImagePickerController()
         pickerController.delegate = self;
         pickerController.allowsEditing = true
         
         let alertController = UIAlertController(title: "Add an Image", message: "Choose From", preferredStyle: .actionSheet)
         
         let cameraAction = UIAlertAction(title: "Camera", style: .default) { (action) in
-            pickerController.sourceType = .camera
-            self.present(pickerController, animated: true, completion: nil)
+            self.pickerController.sourceType = .camera
+            self.present(self.pickerController, animated: true, completion: nil)
             
         }
         
         let photosLibraryAction = UIAlertAction(title: "Photos Library", style: .default) { (action) in
-            pickerController.sourceType = .photoLibrary
-            self.present(pickerController, animated: true, completion: nil)
+            self.pickerController.sourceType = .photoLibrary
+            self.present(self.pickerController, animated: true, completion: nil)
             
         }
         
         let savedPhotosAction = UIAlertAction(title: "Saved Photos Album", style: .default) { (action) in
-            pickerController.sourceType = .savedPhotosAlbum
-            self.present(pickerController, animated: true, completion: nil)
+            self.pickerController.sourceType = .savedPhotosAlbum
+            self.present(self.pickerController, animated: true, completion: nil)
             
         }
         
@@ -143,10 +152,6 @@ class NotesDetailController: UIViewController, CLLocationManagerDelegate, UIImag
         alertController.addAction(cancelAction)
         
         present(alertController, animated: true, completion: nil)
-        } else {
-            navigationController?.popViewController(animated: false)
-        }
-        
     }
     
     func imagePickerControllerDidCancel(_ picker: UIImagePickerController) {
@@ -178,12 +183,13 @@ class NotesDetailController: UIViewController, CLLocationManagerDelegate, UIImag
     
     override func viewWillDisappear(_ animated: Bool) {
         super.viewWillDisappear(animated)
+        if (pickerController.isBeingPresented == false) {
         if self.noteData == nil {
             if (self.noteTextView.text != "") {
                 delegate?.saveNewNote(title: noteTextView.attributedText.toNSData()!, date: Date(), text: noteTextView.attributedText.toNSData()!, lat:lat!.rounded(digits: 3), lng:lng!.rounded(digits: 3))
             }
         } else {
-                //lat = 43.80
+                //lat = 43.787
                 if (noteData.lat.rounded(digits: 3) != lat?.rounded(digits: 3) || noteData.lng.rounded(digits: 3) != lng?.rounded(digits: 3) ) {
                     let alert = UIAlertController(title: "Notice", message: "Note location is changed. Do you want to update location?", preferredStyle: UIAlertController.Style.alert)
                     alert.addAction(UIAlertAction(title: "Yes", style: UIAlertAction.Style.default, handler: { action in
@@ -200,6 +206,7 @@ class NotesDetailController: UIViewController, CLLocationManagerDelegate, UIImag
                 guard let newText = self.noteTextView.attributedText.toNSData() else { return }
                 CoreDataManager.shared.saveUpdatedNote(note: self.noteData, newText: newText, newLat: noteData.lat.rounded(digits: 3), newLng: noteData.lng.rounded(digits: 3))
             }
+        }
         }
     }
 }
