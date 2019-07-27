@@ -83,20 +83,21 @@ class NotesController: UITableViewController {
 
 extension NotesController {
     
-
-    
     override func tableView(_ tableView: UITableView, editActionsForRowAt indexPath: IndexPath) -> [UITableViewRowAction]? {
-        
         var actions = [UITableViewRowAction]()
-        
         let deleteAction = UITableViewRowAction(style: .destructive, title: "Delete") { (action, indexPath) in
-            let targetRow = indexPath.row
-            if CoreDataManager.shared.deleteNote(note: self.notes[targetRow]) {
-                self.notes.remove(at: targetRow)
-                self.filteredNotes.remove(at: targetRow)
-                tableView.deleteRows(at: [indexPath], with: .fade)
-                self.viewWillAppear(true)
-            }
+            let alert = UIAlertController(title: "Notice", message: "Do you want to remove the note?", preferredStyle: UIAlertController.Style.alert)
+            alert.addAction(UIAlertAction(title: "Yes", style: UIAlertAction.Style.default, handler: { action in
+                let targetRow = indexPath.row
+                if CoreDataManager.shared.deleteNote(note: self.notes[targetRow]) {
+                    self.notes.remove(at: targetRow)
+                    self.filteredNotes.remove(at: targetRow)
+                    tableView.deleteRows(at: [indexPath], with: .fade)
+                    self.viewWillAppear(true)
+                }
+            }))
+            alert.addAction(UIAlertAction(title: "Cancel", style: UIAlertAction.Style.cancel, handler: nil))
+            self.present(alert, animated: true, completion: nil)
         }
         actions.append(deleteAction)
         return actions
@@ -146,8 +147,8 @@ extension NotesController: UISearchBarDelegate {
 }
 
 extension NotesController: NoteDelegate {
-    func saveNewNote(title: String, date: Date, text: String) {
-        let newNote = CoreDataManager.shared.createNewNote(title: title, date: date, text: text, noteCategory: self.categoryData)
+    func saveNewNote(title: String, date: Date, text: String, lat: Double, lng: Double) {
+        let newNote = CoreDataManager.shared.createNewNote(title: title, date: date, text: text, lat: lat, lng: lng, noteCategory: self.categoryData)
         notes.append(newNote)
         filteredNotes.append(newNote)
         self.tableView.insertRows(at: [IndexPath(row: notes.count - 1, section: 0)], with: .fade)

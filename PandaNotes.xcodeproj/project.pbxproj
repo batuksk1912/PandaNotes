@@ -14,6 +14,7 @@
 		0484BAC822E90EE70060A7E1 /* NoteCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0484BAC722E90EE70060A7E1 /* NoteCell.swift */; };
 		0484BAD122E929090060A7E1 /* PandaNotes.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 0484BACF22E929090060A7E1 /* PandaNotes.xcdatamodeld */; };
 		0484BAD322E934AF0060A7E1 /* CoreDataManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0484BAD222E934AF0060A7E1 /* CoreDataManager.swift */; };
+		0484BAD622EBFB360060A7E1 /* LocationController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0484BAD522EBFB360060A7E1 /* LocationController.swift */; };
 		049E75E522E6D5D7003210F2 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 049E75E422E6D5D7003210F2 /* AppDelegate.swift */; };
 		049E75E722E6D5D7003210F2 /* CategoriesController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 049E75E622E6D5D7003210F2 /* CategoriesController.swift */; };
 		049E75EC22E6D5DC003210F2 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 049E75EB22E6D5DC003210F2 /* Assets.xcassets */; };
@@ -28,6 +29,7 @@
 		0484BAC722E90EE70060A7E1 /* NoteCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NoteCell.swift; sourceTree = "<group>"; };
 		0484BAD022E929090060A7E1 /* PandaNotes.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = PandaNotes.xcdatamodel; sourceTree = "<group>"; };
 		0484BAD222E934AF0060A7E1 /* CoreDataManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CoreDataManager.swift; sourceTree = "<group>"; };
+		0484BAD522EBFB360060A7E1 /* LocationController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocationController.swift; sourceTree = "<group>"; };
 		049E75E122E6D5D7003210F2 /* PandaNotes.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = PandaNotes.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		049E75E422E6D5D7003210F2 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		049E75E622E6D5D7003210F2 /* CategoriesController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CategoriesController.swift; sourceTree = "<group>"; };
@@ -53,6 +55,7 @@
 				049E75E622E6D5D7003210F2 /* CategoriesController.swift */,
 				0484BABA22E6DD830060A7E1 /* NotesController.swift */,
 				0484BABE22E6F1680060A7E1 /* NotesDetailController.swift */,
+				0484BAD522EBFB360060A7E1 /* LocationController.swift */,
 			);
 			path = Controllers;
 			sourceTree = "<group>";
@@ -184,6 +187,7 @@
 				0484BAC822E90EE70060A7E1 /* NoteCell.swift in Sources */,
 				0484BAD122E929090060A7E1 /* PandaNotes.xcdatamodeld in Sources */,
 				0484BAC622E9095E0060A7E1 /* CategoryCell.swift in Sources */,
+				0484BAD622EBFB360060A7E1 /* LocationController.swift in Sources */,
 				0484BAD322E934AF0060A7E1 /* CoreDataManager.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

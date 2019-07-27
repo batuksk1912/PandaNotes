@@ -34,9 +34,9 @@ extension UIView {
     }
 }
 
-extension String {
-    func deletingPrefix(_ prefix: String) -> String {
-        guard self.hasPrefix(prefix) else { return self }
-        return String(self.dropFirst(prefix.count))
+extension Double {
+    func rounded(digits: Int) -> Double {
+        let multiplier = pow(10.0, Double(digits))
+        return (self * multiplier).rounded() / multiplier
     }
 }

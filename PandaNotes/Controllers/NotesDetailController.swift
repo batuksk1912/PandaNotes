@@ -7,12 +7,13 @@
 //
 
 import UIKit
+import CoreLocation
 
 protocol NoteDelegate {
-    func saveNewNote(title: String, date: Date, text: String)
+    func saveNewNote(title: String, date: Date, text: String, lat: Double, lng: Double)
 }
 
-class NotesDetailController: UIViewController {
+class NotesDetailController: UIViewController, CLLocationManagerDelegate {
     
     let dateFormatter: DateFormatter = {
         let dateFormatter = DateFormatter()
@@ -28,6 +29,10 @@ class NotesDetailController: UIViewController {
     }
     
     var delegate: NoteDelegate?
+    fileprivate let locManager = CLLocationManager()
+    fileprivate var curLoc = CLLocation()
+    fileprivate var lat:Double?
+    fileprivate var lng:Double?
     
     fileprivate var noteTextView: UITextView = {
         let nt = UITextView()
@@ -66,27 +71,59 @@ class NotesDetailController: UIViewController {
         super.viewDidLoad()
         view.backgroundColor = .white
         setupTextView()
+        locManager.delegate = self
+        locManager.desiredAccuracy = kCLLocationAccuracyNearestTenMeters
+        locManager.distanceFilter = 100
+        locManager.requestWhenInUseAuthorization()
     }
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
+        curLoc = locManager.location!
         let topItems:[UIBarButtonItem] = [
-            UIBarButtonItem(barButtonSystemItem: .action, target: nil, action: nil),
+            UIBarButtonItem(barButtonSystemItem: .action, target: self, action: #selector(self.checkLocation)),
             UIBarButtonItem(barButtonSystemItem: .camera, target: nil, action: nil)
         ]
         self.navigationItem.setRightBarButtonItems(topItems, animated: false)
+        if (CLLocationManager.authorizationStatus() == .authorizedWhenInUse ||
+            CLLocationManager.authorizationStatus() ==  .authorizedAlways) {
+            lat = curLoc.coordinate.latitude
+            lng = curLoc.coordinate.longitude
+        }
+    }
+    
+    @objc fileprivate func checkLocation() {
+        let locationController = LocationController()
+        if (noteData.lat != 0.0 && noteData.lng != 0.0) {
+        locationController.lat = noteData.lat.rounded(digits: 2)
+        locationController.lng = noteData.lng.rounded(digits: 2)
+        } else {
+            locationController.lat = lat?.rounded(digits: 2)
+            locationController.lng = lng?.rounded(digits: 2)
+        }
+        navigationController?.pushViewController(locationController, animated: true)
     }
     
     override func viewWillDisappear(_ animated: Bool) {
         super.viewWillDisappear(animated)
-        
         if self.noteData == nil {
             if (self.noteTextView.text != "") {
-            delegate?.saveNewNote(title: noteTextView.text, date: Date(), text: noteTextView.text)
+                delegate?.saveNewNote(title: noteTextView.text, date: Date(), text: noteTextView.text, lat:lat!.rounded(digits: 2), lng:lng!.rounded(digits: 2))
             }
         } else {
+            if (noteData.lat.rounded(digits: 2) != lat?.rounded(digits: 2) || noteData.lng.rounded(digits: 2) != lng?.rounded(digits: 2) ) {
+                let alert = UIAlertController(title: "Notice", message: "Note location is changed. Do you want to update location?", preferredStyle: UIAlertController.Style.alert)
+                alert.addAction(UIAlertAction(title: "Yes", style: UIAlertAction.Style.default, handler: { action in
+                    guard let newText = self.noteTextView.text else { return }
+                    CoreDataManager.shared.saveUpdatedNote(note: self.noteData, newText: newText, newLat: self.lat!.rounded(digits: 2), newLng: self.lng!.rounded(digits: 2))
+                    self.navigationController?.popViewController(animated: false)
+                }))
+                alert.addAction(UIAlertAction(title: "Cancel", style: UIAlertAction.Style.cancel, handler: nil))
+                self.present(alert, animated: true, completion: nil)
+            } else {
             guard let newText = self.noteTextView.text else { return }
-            CoreDataManager.shared.saveUpdatedNote(note: self.noteData, newText: newText)
+            CoreDataManager.shared.saveUpdatedNote(note: self.noteData, newText: newText, newLat: noteData.lat.rounded(digits: 2), newLng: noteData.lng.rounded(digits: 2))
+            }
         }
     }
 }
