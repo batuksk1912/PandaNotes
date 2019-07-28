@@ -143,7 +143,6 @@ extension NotesController {
         let noteForRow = self.filteredNotes[indexPath.row]
         notesDetailController.noteData = noteForRow
         navigationController?.pushViewController(notesDetailController, animated: true)
-       
     }
 }
 

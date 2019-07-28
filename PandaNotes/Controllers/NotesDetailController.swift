@@ -31,7 +31,6 @@ class NotesDetailController: UIViewController, CLLocationManagerDelegate, UIImag
     var delegate: NoteDelegate?
     let pickerController = UIImagePickerController()
     fileprivate let locManager = CLLocationManager()
-    //fileprivate var curLoc = CLLocation()
     fileprivate var lat:Double?
     fileprivate var lng:Double?
     
@@ -160,19 +159,9 @@ class NotesDetailController: UIViewController, CLLocationManagerDelegate, UIImag
     
     func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [UIImagePickerController.InfoKey : Any]) {
         if let image = info[UIImagePickerController.InfoKey.originalImage] as? UIImage {
-            //let attachment = NSTextAttachment()
-            //attachment.image = image
-            //calculate new size.  (-20 because I want to have a litle space on the right of picture)
-            //let newImageWidth = (noteTextView.bounds.size.width - 20 )
-            //let scale = newImageWidth/image.size.width
-            //let newImageHeight = image.size.height * scale
-            //resize this
-            //attachment.bounds = CGRect.init(x: 0, y: 0, width: newImageWidth, height: newImageHeight)
-            //put your NSTextAttachment into and attributedString
             let scaledImage = image.resized(toWidth: self.noteTextView.frame.size.width)
             let encodedImageString = (scaledImage!.pngData()?.base64EncodedString())!
             let attString = NSAttributedString(base64EndodedImageString: encodedImageString)!
-            //add this attributed string to the current position.
             noteTextView.textStorage.insert(attString, at: noteTextView.selectedRange.location)
             picker.dismiss(animated: true, completion: nil)
             self.dismiss(animated: true, completion: nil)

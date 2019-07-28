@@ -111,8 +111,6 @@ class CategoriesController: UITableViewController {
         navigationBar?.setBackgroundImage(slightWhite, for: .default)
         navigationBar?.shadowImage = slightWhite
     }
-
-
 }
 
 extension CategoriesController {
@@ -131,12 +129,10 @@ extension CategoriesController {
             if (noteCategory[indexPath.row].notes!.count > 0) {
                 let alert = UIAlertController(title: "Notice", message: "Do you want to move the notes into Default category before destroyed?", preferredStyle: UIAlertController.Style.alert)
                 alert.addAction(UIAlertAction(title: "Yes", style: UIAlertAction.Style.default, handler: { action in
-                    //write for yes
                     CoreDataManager.shared.moveToDefault(from: noteCategory[indexPath.row])
                     tableView.reloadData()
                 }))
                 alert.addAction(UIAlertAction(title: "No", style: UIAlertAction.Style.destructive, handler: { action in
-                    //write for no
                     let noteSelectedCategory = noteCategory[indexPath.row]
                     if CoreDataManager.shared.deleteNoteCategories(noteCategory: noteSelectedCategory) {
                         noteCategory.remove(at: indexPath.row)
@@ -176,6 +172,4 @@ extension CategoriesController {
         notesController.categoryData = categoryForRowSelected
         navigationController?.pushViewController(notesController, animated: true)
     }
-    
-    
 }
