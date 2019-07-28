@@ -128,10 +128,28 @@ extension CategoriesController {
     
     override func tableView(_ tableView: UITableView, editActionsForRowAt indexPath: IndexPath) -> [UITableViewRowAction]? {
         let deleteAction = UITableViewRowAction(style: .destructive, title: "Delete") { (rowAction, indexPath) in
-            let noteSelectedCategory = noteCategory[indexPath.row]
-            if CoreDataManager.shared.deleteNoteCategories(noteCategory: noteSelectedCategory) {
-                noteCategory.remove(at: indexPath.row)
-                tableView.deleteRows(at: [indexPath], with: .fade)
+            if (noteCategory[indexPath.row].notes!.count > 0) {
+                let alert = UIAlertController(title: "Notice", message: "Do you want to move the notes into Default category before destroyed?", preferredStyle: UIAlertController.Style.alert)
+                alert.addAction(UIAlertAction(title: "Yes", style: UIAlertAction.Style.default, handler: { action in
+                    //write for yes
+                    CoreDataManager.shared.moveToDefault(from: noteCategory[indexPath.row])
+                    tableView.reloadData()
+                }))
+                alert.addAction(UIAlertAction(title: "No", style: UIAlertAction.Style.destructive, handler: { action in
+                    //write for no
+                    let noteSelectedCategory = noteCategory[indexPath.row]
+                    if CoreDataManager.shared.deleteNoteCategories(noteCategory: noteSelectedCategory) {
+                        noteCategory.remove(at: indexPath.row)
+                        tableView.deleteRows(at: [indexPath], with: .fade)
+                    }
+                }))
+                self.present(alert, animated: true, completion: nil)
+            } else {
+                let noteSelectedCategory = noteCategory[indexPath.row]
+                if CoreDataManager.shared.deleteNoteCategories(noteCategory: noteSelectedCategory) {
+                    noteCategory.remove(at: indexPath.row)
+                    tableView.deleteRows(at: [indexPath], with: .fade)
+                }
             }
         }
         return [deleteAction]

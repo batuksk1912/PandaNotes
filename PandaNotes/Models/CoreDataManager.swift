@@ -28,7 +28,6 @@ struct CoreDataManager {
         let newNoteCategory = NSEntityDescription.insertNewObject(forEntityName: "NoteCategory", into: context) as! NoteCategory
         
         newNoteCategory.title = title
-        //newNoteCategory.setValue(title, forKey: "title")
         
         do {
             try context.save()
@@ -91,6 +90,35 @@ struct CoreDataManager {
     func fetchNotes(from categoryData: NoteCategory) -> [Note] {
         guard let categoryNotes = categoryData.notes?.allObjects as? [Note] else { return [] }
         return categoryNotes
+    }
+    
+    func moveToDefault(from categoryData: NoteCategory) {
+        let context = persistentContainer.viewContext
+        let predicate = NSPredicate(format: "noteCategory == %@", categoryData)
+        let fetchRequest = NSFetchRequest<Note>(entityName: "Note")
+        fetchRequest.predicate = predicate
+        
+        let predicateDef = NSPredicate(format: "title == %@", "Default")
+        let fetchRequestDef = NSFetchRequest<NoteCategory>(entityName: "NoteCategory")
+        fetchRequestDef.fetchLimit =  1
+        fetchRequestDef.predicate = predicateDef
+        
+        do {
+            let fetchedEntities = try context.fetch(fetchRequest)
+            let fetchedCategory = try context.fetch(fetchRequestDef)
+            
+            for entity in fetchedEntities {
+                entity.noteCategory = fetchedCategory[0]
+            }
+        } catch let err {
+            print("Error moving note",err)
+        }
+        
+        do {
+            try context.save()
+        } catch let err {
+            print("Error changing category of notes",err)
+        }
     }
     
     func deleteNote(note: Note) -> Bool {
