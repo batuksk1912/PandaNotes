@@ -173,11 +173,11 @@ class NotesDetailController: UIViewController, CLLocationManagerDelegate, UIImag
     override func viewWillDisappear(_ animated: Bool) {
         super.viewWillDisappear(animated)
         if (pickerController.isBeingPresented == false) {
-        if self.noteData == nil {
-            if (self.noteTextView.text != "") {
-                delegate?.saveNewNote(title: noteTextView.attributedText.toNSData()!, date: Date(), text: noteTextView.attributedText.toNSData()!, lat:lat!.rounded(digits: 3), lng:lng!.rounded(digits: 3))
-            }
-        } else {
+            if self.noteData == nil {
+                if (self.noteTextView.text != "") {
+                    delegate?.saveNewNote(title: noteTextView.attributedText.toNSData()!, date: Date(), text: noteTextView.attributedText.toNSData()!, lat:lat!.rounded(digits: 3), lng:lng!.rounded(digits: 3))
+                }
+            } else {
                 //lat = 43.787
                 if (noteData.lat.rounded(digits: 3) != lat?.rounded(digits: 3) || noteData.lng.rounded(digits: 3) != lng?.rounded(digits: 3) ) {
                     let alert = UIAlertController(title: "Notice", message: "Note location is changed. Do you want to update location?", preferredStyle: UIAlertController.Style.alert)
@@ -191,11 +191,11 @@ class NotesDetailController: UIViewController, CLLocationManagerDelegate, UIImag
                         self.present(alert, animated: true)
                     })
                 }
-             else {
-                guard let newText = self.noteTextView.attributedText.toNSData() else { return }
-                CoreDataManager.shared.saveUpdatedNote(note: self.noteData, newText: newText, newLat: noteData.lat.rounded(digits: 3), newLng: noteData.lng.rounded(digits: 3))
+                else {
+                    guard let newText = self.noteTextView.attributedText.toNSData() else { return }
+                    CoreDataManager.shared.saveUpdatedNote(note: self.noteData, newText: newText, newLat: noteData.lat.rounded(digits: 3), newLng: noteData.lng.rounded(digits: 3))
+                }
             }
-        }
         }
     }
 }
