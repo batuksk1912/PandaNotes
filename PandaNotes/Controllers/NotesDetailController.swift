@@ -28,6 +28,7 @@ class NotesDetailController: UIViewController, CLLocationManagerDelegate, UIImag
         }
     }
     
+    var editChecker: Bool = false
     var delegate: NoteDelegate?
     let pickerController = UIImagePickerController()
     fileprivate let locManager = CLLocationManager()
@@ -56,6 +57,7 @@ class NotesDetailController: UIViewController, CLLocationManagerDelegate, UIImag
     fileprivate func setupTextView() {
         view.addSubview(dateTimeLabel)
         view.addSubview(noteTextView)
+        noteTextView.delegate = self
         
         dateTimeLabel.topAnchor.constraint(equalTo: view.topAnchor, constant: 90).isActive = true
         dateTimeLabel.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 20).isActive = true
@@ -172,7 +174,7 @@ class NotesDetailController: UIViewController, CLLocationManagerDelegate, UIImag
     
     override func viewWillDisappear(_ animated: Bool) {
         super.viewWillDisappear(animated)
-        if (pickerController.isBeingPresented == false) {
+        if (pickerController.isBeingPresented == false && editChecker == true) {
             if self.noteData == nil {
                 if (self.noteTextView.text != "") {
                     delegate?.saveNewNote(title: noteTextView.attributedText.toNSData()!, date: Date(), text: noteTextView.attributedText.toNSData()!, lat:lat!.rounded(digits: 3), lng:lng!.rounded(digits: 3))
@@ -186,7 +188,10 @@ class NotesDetailController: UIViewController, CLLocationManagerDelegate, UIImag
                         CoreDataManager.shared.saveUpdatedNote(note: self.noteData, newText: newText, newLat: self.lat!.rounded(digits: 3), newLng: self.lng!.rounded(digits: 3))
                         self.navigationController?.popViewController(animated: false)
                     }))
-                    alert.addAction(UIAlertAction(title: "Cancel", style: UIAlertAction.Style.cancel, handler: nil))
+                    alert.addAction(UIAlertAction(title: "Cancel", style: UIAlertAction.Style.cancel, handler: { action in
+                        guard let newText = self.noteTextView.attributedText.toNSData() else { return }
+                        CoreDataManager.shared.saveUpdatedNote(note: self.noteData, newText: newText, newLat: self.noteData.lat.rounded(digits: 3), newLng: self.noteData.lng.rounded(digits: 3))
+                    }))
                     DispatchQueue.main.async(execute: {
                         self.present(alert, animated: true)
                     })
@@ -199,4 +204,11 @@ class NotesDetailController: UIViewController, CLLocationManagerDelegate, UIImag
         }
     }
 }
+
+extension NotesDetailController: UITextViewDelegate {
+    func textViewDidBeginEditing(_ textView: UITextView) {
+        editChecker = true
+    }
+}
+
     
